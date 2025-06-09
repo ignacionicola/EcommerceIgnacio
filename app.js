@@ -6,27 +6,35 @@ const responseHandler = require("./src/middlewares/responseHandler");
 const errorHandler = require("./src/middlewares/errorHandler");
 const cookies = require("cookie-parser");
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-app.use(express.json());// Middleware para parsear el cuerpo de las solicitudes JSON
-app.use(responseHandler);// Middleware para manejar respuestas
-app.use(express.static("public"));// Middleware para servir archivos estáticos desde la carpeta "public"
-connectDB();// Conecta a la base de datos MongoDB
-app.use(cookies()); // Middleware para manejar cookies
-
-
-//rutas
+// Rutas
 const usuarioRouter = require("./src/routes/usuarioRouter");
 const authRouter = require("./src/routes/authRoutes");
 const productoRouter = require("./src/routes/productoRouter");
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Conexión a la base de datos
+connectDB();
+
+// Middlewares globales
+app.use(express.json()); // Parsear JSON
+app.use(cookies()); // Manejar cookies
+app.use(responseHandler); // Respuestas personalizadas
+app.use(express.static("public")); // Servir archivos estáticos
+
+// Rutas de la API
 app.use("/api/productos", productoRouter);
 app.use("/api/usuarios", usuarioRouter);
 app.use("/api/usuarios", authRouter);
 
+// Middleware de manejo de errores (debe ir después de las rutas)
+app.use(errorHandler);
 
-app.listen(PORT, (req, res) => { //patron event-driven 
+// Iniciar el servidor
+app.listen(PORT, () => {
   console.log(`Servidor corriendo: http://localhost:${PORT}`);
 });
-app.use(errorHandler); // Manejador de errores 
-module.exports = app; // Exporta la app para poder usarla en los tests
 
+// Exportar la app para testing
+module.exports = app;
