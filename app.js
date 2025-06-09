@@ -28,7 +28,7 @@ app.use("/api/productos", productoRouter);
 app.use("/api/usuarios", usuarioRouter);
 app.use("/api/usuarios", authRouter);
 
-// Middleware de manejo de errores (debe ir después de las rutas)
+// Middleware de manejo de errores 
 app.use(errorHandler);
 
 // Iniciar el servidor
