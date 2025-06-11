@@ -17,26 +17,34 @@ async function mostrarProductos() {
     const productos = await res.json();
 
     const tabla = document.querySelector("table");
-    let nombre, stock, precio, boton;
+    // Limpia todas las filas menos el encabezado
+    const filas = tabla.querySelectorAll("tr:not(:first-child)");
+    filas.forEach(fila => fila.remove());
+
     productos.data.forEach((producto) => {
-      let nuevoProducto = document.createElement("tr");
-      nuevoProducto.id = contador;
-      nombre = document.createElement("td");
-      nombre.id = contador;
-      contador++;
-      stock = document.createElement("td");
-      precio = document.createElement("td");
-      nombre.textContent = producto.nombre;
-      precio.textContent = producto.precio;
-      stock.textContent = producto.stock;
-      nuevoProducto.appendChild(nombre);
-      nuevoProducto.appendChild(precio);
-      nuevoProducto.appendChild(stock);
-      boton = document.createElement("button");
+      const fila = document.createElement("tr");
+
+      const tdNombre = document.createElement("td");
+      tdNombre.textContent = producto.nombre;
+
+      const tdPrecio = document.createElement("td");
+      tdPrecio.textContent = producto.precio;
+
+      const tdStock = document.createElement("td");
+      tdStock.textContent = producto.stock;
+
+      const tdBoton = document.createElement("td");
+      const boton = document.createElement("button");
       boton.textContent = "Agregar al carrito";
       boton.addEventListener("click", botonAgregarCarrito);
-      nuevoProducto.appendChild(boton);
-      tabla.appendChild(nuevoProducto);
+      tdBoton.appendChild(boton);
+
+      fila.appendChild(tdNombre);
+      fila.appendChild(tdPrecio);
+      fila.appendChild(tdStock);
+      fila.appendChild(tdBoton);
+
+      tabla.appendChild(fila);
     });
   } catch (err) {
     console.log(err);
@@ -46,10 +54,12 @@ async function mostrarProductos() {
 
 //Funcion para agregar elementos al carrito con localStorage
 function botonAgregarCarrito(event) {
-  const nombreProducto = event.target.parentElement.children[0].textContent;
+  const fila = event.target.closest("tr");
+  const nombreProducto = fila.children[0].textContent;
+  const precioProducto = fila.children[1].textContent;
   const producto = {
     nombre: nombreProducto,
-    precio: event.target.parentElement.children[1].textContent,
+    precio: precioProducto,
   };
   carrito.push(producto);
   localStorage.setItem(`carrito_${usuarioActual}`, JSON.stringify(carrito));
@@ -69,7 +79,7 @@ function verCarrito() {
   });
 }
 
-// ----------- 🌙 CAMBIO DE TEMA (con ícono y localStorage) -----------
+// -----------  CAMBIO DE TEMA (con ícono y localStorage) -----------
 function aplicarTema(tema) {
   const body = document.body;
   const btnTema = document.getElementById("tema-btn");
